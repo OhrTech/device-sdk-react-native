@@ -82,9 +82,9 @@
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
+    "@expo/config-plugins": "*",
     "react": "*",
-    "react-native": "*",
-    "@expo/config-plugins": "*"
+    "react-native": "*"
   },
   "workspaces": [
     "example"
