@@ -215,6 +215,8 @@ export const OhrKiosk = {
    * [timeoutMs]. If the beats stop for longer (the JS thread hangs), the Agent stops the app and starts it
    * again. Only while the app is pinned; call it again after start(). One per app. JavaScript timers stop while
    * the app is in the background (the screen off, say), so the watch pauses there and resumes on return.
+   * With Agent 1062+, the fleet's response timeout for the app (portal or Management API), when set, replaces
+   * [timeoutMs], and the Agent itself doesn't count hangs while the screen is off.
    */
   heartbeat(timeoutMs = 10_000) {
     if (timeoutMs < 2000 || timeoutMs > 600_000)
