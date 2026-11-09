@@ -1,0 +1,32 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    ".nvmrc",
+    ".yarnrc.yml"
+  ],
+  "globalEnv": [
+    "NODE_ENV"
+  ],
+  "tasks": {
+    "build:android": {
+      "env": [
+        "ANDROID_HOME"
+      ],
+      "inputs": [
+        "package.json",
+        "react-native.config.js",
+        "nitro.json",
+        "android",
+        "!android/build",
+        "cpp",
+        "src/**",
+        "example/package.json",
+        "example/android",
+        "!example/android/.gradle",
+        "!example/android/build",
+        "!example/android/app/build"
+      ],
+      "outputs": []
+    }
+  }
+}

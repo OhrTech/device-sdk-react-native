@@ -1,0 +1,43 @@
+ext.OhrDeviceSdk = [
+  // The OhrTech Device SDK's own minimum: Android 13.
+  minSdkVersion: 33,
+  compileSdkVersion: 36
+]
+
+ext.getExtOrDefault = { prop ->
+  if (rootProject.ext.has(prop)) {
+    return rootProject.ext.get(prop)
+  }
+  return OhrDeviceSdk[prop]
+}
+
+apply plugin: "com.android.library"
+
+if (project.extensions.findByName("kotlin") == null) {
+  apply plugin: "kotlin-android"
+}
+
+apply plugin: "com.facebook.react"
+
+android {
+  namespace "net.ohrtech.device.reactnative"
+
+  compileSdkVersion getExtOrDefault("compileSdkVersion")
+
+  defaultConfig {
+    minSdkVersion Math.max(33, getExtOrDefault("minSdkVersion") as int)
+  }
+}
+
+repositories {
+  google()
+  mavenCentral()
+  // OHR_MAVEN_LOCAL: an unreleased net.ohrtech:device-sdk from ~/.m2 (publishToMavenLocal).
+  if (System.getenv("OHR_MAVEN_LOCAL") != null) mavenLocal()
+}
+
+dependencies {
+  implementation "com.facebook.react:react-android"
+  // The Kotlin library this module wraps: the Agent protocol, its checks and push verification.
+  implementation "net.ohrtech:device-sdk:0.3.0"
+}

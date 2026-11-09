@@ -1,0 +1,45 @@
+# Push a tag such as v0.1.0 to publish that version to npm. Publishing uses npm's trusted publishing from
+# GitHub Actions (no stored token): the package's settings on npmjs.com trust this repository's release.yml
+# in the "release" environment, and npm attaches provenance.
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
+
+permissions:
+  contents: write
+  id-token: write   # the OIDC token npm takes instead of a stored credential
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: The tag is the package's version
+        run: |
+          v=$(node -p "require('./package.json').version")
+          test "v$v" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME, package.json $v"; exit 1; }
+
+      - run: yarn lint
+      - run: yarn typecheck
+      - run: yarn test
+      - run: yarn prepare
+
+      # npm 11.5+ trades the OIDC token for publishing; a prerelease tag (v1.0.0-rc.1) goes out as "next".
+      - name: Publish
+        run: |
+          npm install -g npm@latest
+          tag=latest; [[ "$GITHUB_REF_NAME" == *-* ]] && tag=next
+          npm publish --access public --tag "$tag"
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes "See CHANGELOG.md." $([[ "$GITHUB_REF_NAME" == *-* ]] && echo --prerelease)

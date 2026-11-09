@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Push from the app's server (OhrPush): only the OhrTech Agent holds RECEIVE_PUSH, so nothing else can bind it. -->
+        <service
+            android:name="net.ohrtech.device.reactnative.OhrDevicePushService"
+            android:exported="true"
+            android:permission="net.ohrtech.device.permission.RECEIVE_PUSH">
+            <intent-filter>
+                <action android:name="net.ohrtech.device.action.PUSH" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

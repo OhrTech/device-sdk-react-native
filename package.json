@@ -1,0 +1,146 @@
+{
+  "name": "@ohrtech/device-sdk-react-native",
+  "version": "0.1.0",
+  "description": "The OhrTech Device SDK for React Native: what an app on an OhrTech device can ask the OhrTech Agent for. The device, its updates, Wi-Fi with Android's Wi-Fi screen in your layout, network, kiosk mode, power, settings, managed configuration, attestation, client certificates, USB devices, diagnostics, TEE keys and end-to-end push.",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "ohrtech-device-sdk-react-native-source": "./src/index.ts",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "app.plugin.js",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "example": "yarn workspace @ohrtech/device-sdk-react-native-example",
+    "clean": "del-cli android/build example/android/build example/android/app/build lib",
+    "prepare": "bob build",
+    "typecheck": "tsc",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "test": "jest"
+  },
+  "keywords": [
+    "react-native",
+    "android",
+    "mdm",
+    "kiosk",
+    "device-management",
+    "ohrtech"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OhrTech/device-sdk-react-native.git"
+  },
+  "author": {
+    "name": "OhrTech",
+    "url": "https://ohrtech.net"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OhrTech/device-sdk-react-native/issues"
+  },
+  "homepage": "https://docs.ohrtech.net/device-sdk/",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.1.1",
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^9.39.5",
+    "@react-native/babel-preset": "0.88.0",
+    "@react-native/eslint-config": "0.88.0",
+    "@react-native/jest-preset": "0.88.0",
+    "@types/jest": "^30",
+    "@types/react": "^19.2.0",
+    "del-cli": "^8.0.1",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-ft-flow": "^3.0.11",
+    "eslint-plugin-prettier": "^5.5.7",
+    "jest": "^30",
+    "prettier": "^3.9.10",
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-builder-bob": "^0.44.1",
+    "turbo": "^2.11.10",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "@expo/config-plugins": "*"
+  },
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@4.18.1",
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "codegenConfig": {
+    "name": "OhrDeviceSdkSpec",
+    "type": "all",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "net.ohrtech.device.reactnative"
+    }
+  },
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "create-react-native-library": {
+    "type": "turbo-module",
+    "languages": "kotlin-objc",
+    "tools": [
+      "eslint"
+    ],
+    "version": "0.64.0"
+  },
+  "jest": {
+    "preset": "@react-native/jest-preset",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "peerDependenciesMeta": {
+    "@expo/config-plugins": {
+      "optional": true
+    }
+  }
+}
