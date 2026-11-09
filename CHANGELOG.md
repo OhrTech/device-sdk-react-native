@@ -2,7 +2,7 @@
 
 ## 0.1.0 (unreleased)
 
-The first release: every area of the OhrTech Device SDK (net.ohrtech:device-sdk 0.3.0) for React Native on
+The first release: every area of the OhrTech Device SDK (net.ohrtech:device-sdk 0.3.1) for React Native on
 Android (New Architecture), needing the OhrTech Agent 1059 or later (1061 for diagnostics, USB devices,
 certificates and the kiosk exit PIN).
 
