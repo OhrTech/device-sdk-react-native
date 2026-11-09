@@ -33,8 +33,13 @@ jobs:
       - run: yarn prepare
 
       # npm 11.5+ trades the OIDC token for publishing; a prerelease tag (v1.0.0-rc.1) goes out as "next".
+      # A version already on npm (the first one, published by a person) isn't sent again.
       - name: Publish
         run: |
+          v=${GITHUB_REF_NAME#v}
+          if [ -n "$(npm view "@ohrtech/device-sdk-react-native@$v" version 2>/dev/null)" ]; then
+            echo "@ohrtech/device-sdk-react-native $v is already on npm"; exit 0
+          fi
           npm install -g npm@latest
           tag=latest; [[ "$GITHUB_REF_NAME" == *-* ]] && tag=next
           npm publish --access public --tag "$tag"
