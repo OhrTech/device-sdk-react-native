@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 (unreleased)
+
+Builds on net.ohrtech:device-sdk 0.4.0.
+
+- The module's methods and changes are the library's `OhrJsonApi`, which OhrTech web apps' Device SDK shares: the same
+  names, arguments and JSON as before.
+
 ## 0.1.1 (2026-11-10)
 
 Builds on net.ohrtech:device-sdk 0.3.2.

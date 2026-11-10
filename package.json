@@ -1,6 +1,6 @@
 {
   "name": "@ohrtech/device-sdk-react-native",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The OhrTech Device SDK for React Native: what an app on an OhrTech device can ask the OhrTech Agent for. The device, its updates, Wi-Fi with Android's Wi-Fi screen in your layout, network, kiosk mode, power, settings, managed configuration, attestation, client certificates, USB devices, diagnostics, TEE keys and end-to-end push.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
