@@ -163,7 +163,11 @@ it('WifiConfig builds the Wi-Fi model', () => {
   });
 });
 
-it('the heartbeat refuses a timeout out of range before asking the Agent', () => {
-  expect(() => OhrKiosk.heartbeat(1000)).toThrow(OhrInvalidConfig);
+it('the heartbeat refuses a timeout out of range before asking the Agent', async () => {
+  await expect(OhrKiosk.heartbeat(1000)).rejects.toThrow(OhrInvalidConfig);
   expect(mockNative.beat).not.toHaveBeenCalled();
+  expect(mockNative.call).not.toHaveBeenCalledWith(
+    'kioskBeat',
+    expect.anything()
+  );
 });

@@ -153,6 +153,28 @@ async function run(route: string): Promise<string> {
             });
           })
       );
+      await step(
+        'listener: connection, a second listener starts with the state too',
+        async () => {
+          const first = OhrDeviceSdk.addConnectionListener(() => {});
+          try {
+            await sleep(500);
+            return await new Promise<string>((resolve, reject) => {
+              const t = setTimeout(
+                () => reject(new Error('nothing in 5 s')),
+                5000
+              );
+              const s = OhrDeviceSdk.addConnectionListener((c) => {
+                clearTimeout(t);
+                s.remove();
+                resolve(c);
+              });
+            });
+          } finally {
+            first.remove();
+          }
+        }
+      );
       break;
     case 'security':
       await step('attest ec', async () => {
@@ -270,7 +292,7 @@ async function run(route: string): Promise<string> {
       await step('kiosk start', () => OhrKiosk.start());
       await step('heartbeat, then hang', async () => {
         // Beats every 750 ms from the JS thread; then the JS thread stops for 30 s: the Agent restarts the app.
-        OhrKiosk.heartbeat(3000);
+        await OhrKiosk.heartbeat(3000);
         await sleep(2000);
         console.log('CHECK HANGING');
         const until = Date.now() + 30_000;

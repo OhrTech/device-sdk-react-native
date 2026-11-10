@@ -27,17 +27,44 @@ export const OhrDeviceSdk = {
   connect: (timeoutMs = 10_000) =>
     call<null>('connect', { timeoutMs }).then(() => undefined),
   connection: () => call<OhrConnection>('connectionState'),
-  /** The connection as it changes, starting with how it stands. */
-  addConnectionListener: (
+  /** The connection as it changes, starting with how it stands (for each listener). */
+  addConnectionListener(
     listener: (c: OhrConnection) => void,
     onError?: ErrorListener
-  ): OhrSubscription =>
-    listen<OhrConnection, OhrConnection>(
+  ): OhrSubscription {
+    let last: OhrConnection | undefined;
+    let heard = false;
+    let removed = false;
+    const emit = (c: OhrConnection) => {
+      if (removed || c === last) return;
+      last = c;
+      listener(c);
+    };
+    const sub = listen<OhrConnection, OhrConnection>(
       'connection',
       (c) => c,
-      listener,
+      (c) => {
+        heard = true;
+        emit(c);
+      },
       onError
-    ),
+    );
+    // The shared watch gives the state only to its first listener: each later one asks.
+    call<OhrConnection>('connectionState').then(
+      (c) => {
+        if (!heard) emit(c);
+      },
+      (e) => {
+        if (!removed) onError?.(e);
+      }
+    );
+    return {
+      remove() {
+        removed = true;
+        sub.remove();
+      },
+    };
+  },
 };
 
 /** Who the Agent takes this app for, and what the fleet lets it do. */
@@ -216,15 +243,18 @@ export const OhrKiosk = {
    * again. Only while the app is pinned; call it again after start(). One per app. JavaScript timers stop while
    * the app is in the background (the screen off, say), so the watch pauses there and resumes on return.
    * With Agent 1062+, the fleet's response timeout for the app (portal or Management API), when set, replaces
-   * [timeoutMs], and the Agent itself doesn't count hangs while the screen is off.
+   * [timeoutMs], and the Agent itself doesn't count hangs while the screen is off. Rejects with OhrUnsupported
+   * on an Agent before 1061, and then doesn't beat.
    */
-  heartbeat(timeoutMs = 10_000) {
+  async heartbeat(timeoutMs = 10_000): Promise<void> {
     if (timeoutMs < 2000 || timeoutMs > 600_000)
       throw new OhrInvalidConfig(
         'timeoutMs: 2 s to 10 minutes',
         'timeoutMs',
         '2 s to 10 minutes'
       );
+    // The first beat through the checked path: an Agent without the watchdog says so here.
+    await call<null>('kioskBeat', { timeoutMs });
     beatTimeout = timeoutMs;
     followAppState();
     startBeats();

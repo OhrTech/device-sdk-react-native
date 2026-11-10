@@ -23,7 +23,25 @@ internal object Http {
     /** The certificates changed (a request or renewal): build the TLS context again. */
     fun forget() = factories.clear()
 
+    /** The fleet's changes too (trusted CAs, bundles), from the first use; with an Agent before 1061, five minutes. */
+    @Volatile
+    private var watching: java.io.Closeable? = null
+
+    private fun watch() {
+        if (watching != null) return
+        synchronized(this) {
+            if (watching == null) {
+                watching = try {
+                    OhrCertificates.listen({ it.run() }) { forget() }
+                } catch (e: OhrException) {
+                    java.io.Closeable { }
+                }
+            }
+        }
+    }
+
     private fun factory(alias: String?): SSLSocketFactory {
+        watch()
         val key = alias ?: ""
         val now = System.currentTimeMillis()
         factories[key]?.takeIf { now - it.madeAt < KEEP_MS }?.let { return it.factory }

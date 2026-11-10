@@ -64,25 +64,36 @@ export const OhrPush = {
   setHandlers(handlers: OhrPushHandlers) {
     AppRegistry.registerHeadlessTask(
       'OhrDevicePush',
-      () => async (event: { kind: string; json: string }) => {
+      () => async (event: { kind: string; json: string; delivery: string }) => {
         const d = JSON.parse(event.json);
-        switch (event.kind) {
-          case 'message':
-            await handlers.onMessage({
-              id: d.id,
-              data: fromBase64(d.data),
-              expiresAtMs: d.expiresAtMs,
-              highPriority: d.highPriority,
-              pushId: d.pushId,
-            });
-            break;
-          case 'token':
-            await handlers.onTokenChanged?.(d.token ?? null);
-            break;
-          case 'dropped':
-            await handlers.onDropped?.(d.pushId, d.reason);
-            break;
+        // The service waits for the outcome: a message the handler didn't take is reported to the hub as dropped.
+        let failed: string | null = null;
+        try {
+          switch (event.kind) {
+            case 'message':
+              await handlers.onMessage({
+                id: d.id,
+                data: fromBase64(d.data),
+                expiresAtMs: d.expiresAtMs,
+                highPriority: d.highPriority,
+                pushId: d.pushId,
+              });
+              break;
+            case 'token':
+              await handlers.onTokenChanged?.(d.token ?? null);
+              break;
+            case 'dropped':
+              await handlers.onDropped?.(d.pushId, d.reason);
+              break;
+          }
+        } catch (e) {
+          console.error(`OhrDevicePush: the ${event.kind} handler threw`, e);
+          failed = 'handler';
         }
+        await call<null>('pushDone', {
+          delivery: event.delivery,
+          failed,
+        }).catch(() => undefined);
       }
     );
   },

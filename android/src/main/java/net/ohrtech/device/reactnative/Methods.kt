@@ -73,6 +73,7 @@ internal class Methods(private val activity: () -> Activity?) {
         "kioskState" to { _ -> OhrKiosk.state().let { JSONObject().put("pinned", it.pinned).put("mode", it.mode).put("features", it.features).put("appMayExit", it.appMayExit) } },
         "kioskRequestExit" to { _ -> OhrKiosk.requestExit(); null },
         "kioskStopHeartbeat" to { _ -> OhrKiosk.stopHeartbeat(); null },
+        "kioskBeat" to { a -> OhrKiosk.beat(a.getLong("timeoutMs")); null },
 
         // Power
         "powerBattery" to { _ -> OhrPower.battery().json() },
@@ -155,6 +156,7 @@ internal class Methods(private val activity: () -> Activity?) {
         },
         "pushToken" to { _ -> OhrPush.token()?.json() },
         "pushUnregister" to { _ -> OhrPush.unregister(); null },
+        "pushDone" to { a -> OhrDevicePushService.done(a.getString("delivery"), a.optString("failed").takeIf { a.has("failed") && !a.isNull("failed") }); null },
         "pushSetSenderKeys" to { a -> OhrPush.setSenderKeys(senderKeys(a.getJSONArray("keys"))); null },
         "pushSenderKeys" to { _ -> JSONArray(OhrPush.senderKeys().map { k -> JSONObject().put("ed25519", b64(k.ed25519)).apply { k.mlDsa65?.let { put("mlDsa65", b64(it)) } } }) },
     )
